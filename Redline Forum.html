@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brembo/Redline Chat</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #0c0c0c;
+            color: #ffffff;
+            overflow: hidden;
+            position: relative;
+        }
+        h1 {
+            color: #ff0000;
+            font-size: 2em;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 20px;
+        }
+        #telegram-btn {
+            background-color: #128C7E;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+            z-index: 1;
+        }
+        #shoutbox {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        #chat-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        #chat-messages {
+            max-height: 300px;
+            overflow-y: auto;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #222;
+            color: #fff;
+        }
+        #message-input {
+            width: 80%;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        #send-button {
+            background-color: #128C7E;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+    </style>
+
+    <!-- User Counter Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const lastUserKey = 'lastUser';
+            const counterResetTime = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+            function getCounter() {
+                let lastUser = parseInt(localStorage.getItem(lastUserKey), 10) || 0;
+                const timestamp = parseInt(localStorage.getItem('timestamp'), 10) || 0;
+
+                // Check if it's time to reset the counter (24 hours)
+                const currentTime = new Date().getTime();
+                if (currentTime - timestamp > counterResetTime || currentTime < timestamp) {
+                    lastUser = 0;
+                    localStorage.setItem(lastUserKey, lastUser);
+                    localStorage.setItem('timestamp', currentTime);
+                    clearShoutbox();
+                }
+
+                return lastUser + 1;
+            }
+
+            function updateCounterDisplay() {
+                const counter = getCounter();
+                document.getElementById('user-counter').innerText = counter;
+                localStorage.setItem(lastUserKey, counter);
+            }
+
+            updateCounterDisplay();
+
+            document.getElementById('telegram-btn').addEventListener('click', function () {
+                updateCounterDisplay();
+                toggleShoutbox();
+            });
+
+            // Optionally, you can call updateCounterDisplay on other user interactions.
+        });
+
+        function getAnonymousName(id) {
+            return `Anon ${id}`;
+        }
+
+        function updateShoutbox(message) {
+            const shoutbox = document.getElementById('shoutbox');
+            const userCounter = parseInt(localStorage.getItem('lastUser')) || 0;
+            const userName = getAnonymousName(userCounter);
+
+            // Get the current time
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+
+            // Simulated shoutbox message
+            const shoutMessage = `[${hours}:${minutes}:${seconds}] ${userName}: ${message}`;
+
+            // Append the message to the shoutbox
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = shoutMessage;
+            shoutbox.appendChild(messageElement);
+
+            // Scroll to the bottom of the shoutbox
+            shoutbox.scrollTop = shoutbox.scrollHeight;
+        }
+
+        function clearShoutbox() {
+            const shoutbox = document.getElementById('shoutbox');
+            shoutbox.innerHTML = '';
+        }
+    </script>
+
+    <!-- Chat21 Library -->
+    <script src="https://unpkg.com/chat21"></script>
+
+    <!-- Script to reset ID and clear shoutbox every 24 hours -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setInterval(function () {
+                // Reset the ID counter and clear the shoutbox
+                localStorage.setItem('lastUser', '0');
+                localStorage.setItem('timestamp', new Date().getTime());
+                clearShoutbox();
+            }, 24 * 60 * 60 * 1000); // Run every 24 hours
+        });
+    </script>
+
+    <!-- Falling snowflakes -->
+    <script>
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.innerHTML = '&#10052;';
+            snowflake.className = 'snowflake';
+
+            const startPosition = Math.random() * 100;
+            const startOpacity = Math.random() * 0.5 + 0.2;
+
+            snowflake.style.left = `${startPosition}vw`;
+            snowflake.style.opacity = startOpacity.toString();
+
+            document.body.appendChild(snowflake);
+
+            setTimeout(() => {
+                snowflake.remove();
+            }, 10000);
+        }
+
+        function createSnowfall() {
+            setInterval(createSnowflake, 1000);
+        }
+
+        createSnowfall();
+    </script>
+
+    <!-- Malicious Activity Monitoring Script -->
+    <script>
+        function watchForMaliciousActivity() {
+            document.addEventListener('click', function (event) {
+                console.log('Click event detected:', event);
+                // You can add more checks or actions as needed
+            });
+
+            document.addEventListener('keydown', function (event) {
+                console.log('Keydown event detected:', event);
+                // You can add more checks or actions as needed
+            });
+
+            // Add more event listeners or checks as needed
+        }
+
+        watchForMaliciousActivity();
+    </script>
+
+    <!-- VPN detection script -->
+    <script>
+        function detectVPN() {
+            const vpnHeaders = [
+                'X-Forwarded-For',
+                'X-Forwarded',
+                'X-Cluster-Client-Ip',
+                'Via',
+                'Forwarded-For',
+                'Proxy-Client-IP',
+                'HTTP_X_FORWARDED_FOR',
+                'HTTP_X_FORWARDED',
+                'HTTP_X_CLUSTER_CLIENT_IP',
+                'HTTP_VIA',
+                'HTTP_FORWARD_FOR',
+                'HTTP_PROXY_CLIENT_IP'
+            ];
+
+            const detected = vpnHeaders.some(header => navigator.userAgent.includes('VPN') || navigator.userAgent.includes('Proxy') || document.headers[header]);
+
+            if (detected) {
+                alert('Please stop using VPN/Proxy to access this site.');
+            }
+        }
+
+        detectVPN();
+    </script>
+
+    <!-- Updated script for displaying and updating Bulgarian local time -->
+    <script>
+        function updateBulgarianTime() {
+            const timeElement = document.getElementById('local-time');
+            if (timeElement) {
+                const now = new Date();
+                const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+                const bulgarianTime = new Date(utc + 3 * 60 * 60000);
+
+                const hours = bulgarianTime.getHours().toString().padStart(2, '0');
+                const minutes = bulgarianTime.getMinutes().toString().padStart(2, '0');
+
+                timeElement.innerText = `${hours}:${minutes}`;
+            }
+        }
+
+        // Initial display of time
+        updateBulgarianTime();
+
+        // Update time every minute (adjust as needed)
+        setInterval(updateBulgarianTime, 60000);
+    </script>
+
+    <!-- New script for chat functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chatMessagesContainer = document.getElementById('chat-messages');
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message !== '') {
+                    updateShoutbox(message);
+                    messageInput.value = '';
+                }
+            }
+
+            sendButton.addEventListener('click', sendMessage);
+
+            function updateChat(message) {
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                const timestamp = `[${hours}:${minutes}:${seconds}]`;
+
+                const chatMessage = `${timestamp} ${message}`;
+                const messageElement = document.createElement('div');
+                messageElement.innerHTML = chatMessage;
+                chatMessagesContainer.appendChild(messageElement);
+
+                // Scroll to the bottom of the chat messages
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            }
+
+            // Clear shoutbox to show only chat messages
+            function clearShoutbox() {
+                const shoutbox = document.getElementById('shoutbox');
+                shoutbox.style.display = 'none';
+            }
+
+            // Override the updateShoutbox function to use updateChat for chat messages
+            updateShoutbox = updateChat;
+
+            // Optionally, you can call updateCounterDisplay on other user interactions.
+        });
+    </script>
+</head>
+<body>
+    <h1>Brembo/Redline</h1>
+    <p>ID <span id="user-counter">Loading...</span></p>
+    <!-- Remove the following line to hide the "Current Local Time" message -->
+    <p>: <span id="local-time"></span></p>
+    <a id="telegram-btn" href="#">Telegram</a>
+
+    <!-- Shoutbox -->
+    <div id="shoutbox">
+        <!-- ... (existing shoutbox content remains unchanged) ... -->
+    </div>
+
+    <!-- Chat container -->
+    <div id="chat-container">
+        <div id="chat-messages"></div>
+        <input type="text" id="message-input" placeholder="Type your message...">
+        <button id="send-button" onclick="sendMessage()">Send</button>
+    </div>
+
+    <!-- Falling snowflakes -->
+    <script>
+        // ... (existing falling snowflakes script remains unchanged) ...
+    </script>
+
+    <!-- Malicious Activity Monitoring Script -->
+    <
